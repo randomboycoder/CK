@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BarChart3, ChevronDown, FileText, LayoutDashboard, Package, Settings2, Sparkles, TrendingUp, Users, X } from 'lucide-react'
+import { BarChart3, ChevronDown, FileDown, FileText, LayoutDashboard, Package, RotateCcw, Settings2, Sparkles, TrendingUp, Users, X } from 'lucide-react'
 
 const months = [
   { name: 'Apr', orders: 184, revenue: 18400 }, { name: 'May', orders: 218, revenue: 22100 },
@@ -22,8 +22,16 @@ const orders = [
 export default function Dashboard() {
   const [notice, setNotice] = useState(false)
   const [report, setReport] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const max = Math.max(...months.map((month) => month.revenue))
-  const generate = () => { setReport(true); setNotice(true); window.setTimeout(() => setNotice(false), 3500) }
+  const generate = () => { setReport(true); setSettingsOpen(false); setNotice(true); window.setTimeout(() => setNotice(false), 3500) }
+  const resetAndSavePdf = () => {
+    setReport(false)
+    document.title = 'March 2025 dashboard report'
+    window.setTimeout(() => window.print(), 50)
+    setNotice(true)
+    window.setTimeout(() => setNotice(false), 3500)
+  }
 
   return <div className="dashboard">
     <aside className="sidebar">
@@ -36,12 +44,13 @@ export default function Dashboard() {
         <button className="nav-item"><Users /><span>Customers</span></button>
         <div className="nav-label" style={{ marginTop: 19 }}>Manage</div>
         <button className="nav-item"><FileText /><span>Reports</span></button>
-        <button className="nav-item"><Settings2 /><span>Settings</span></button>
+        <button className={`nav-item ${settingsOpen ? 'active' : ''}`} onClick={() => setSettingsOpen((open) => !open)} aria-pressed={settingsOpen}><Settings2 /><span>Settings</span></button>
       </nav>
       <div className="sidebar-footer">Clear Design<br /><span className="mono">workspace / 2025</span></div>
     </aside>
     <main className="main">
       <header className="topbar"><div><p className="eyebrow">Monday, March 31, 2025</p><h1 className="title">Good morning, Taylor.</h1></div><div className="top-actions"><button className="period">Last 12 months <ChevronDown /></button><button className="generate" onClick={generate}><Sparkles /> Generate report</button></div></header>
+      {settingsOpen && <section className="settings-panel" aria-labelledby="settings-title"><div><p className="eyebrow">Workspace settings</p><h2 id="settings-title">Report controls</h2><p className="settings-copy">Manage your dashboard snapshots and export the current month&apos;s performance.</p></div><div className="settings-actions"><button className="settings-button secondary" onClick={resetAndSavePdf}><RotateCcw /> Reset &amp; save as PDF <span className="mono">MAR 2025</span></button><button className="settings-button primary" onClick={generate}><Sparkles /> Generate now</button></div></section>}
       <section className="hero"><div><p className="eyebrow" style={{ color: '#aabbb0' }}>Annual performance</p><h2>Your commerce engine is accelerating.</h2><p>Revenue and order volume have grown steadily across the last 12 months.</p></div><div className="hero-stat"><div className="big">+31.4%</div><span>year over year revenue</span></div></section>
       <section className="stats" aria-label="Key metrics">
         <Metric label="Total revenue" value="$68,700" foot="+12.2% vs last month" />
